@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexora OS Lite</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00ffae">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="particles"></div>
+
+<aside class="sidebar">
+  <h1>NEXORA</h1>
+  <button onclick="showSection('dashboard')">🏠 Dashboard</button>
+  <button onclick="showSection('projects')">🚀 Proyectos</button>
+  <button onclick="showSection('newProject')">➕ Nuevo</button>
+  <button onclick="exportData()">⬇ Exportar</button>
+  <button onclick="resetData()">🗑 Reset</button>
+</aside>
+
+<main class="main">
+
+<section id="dashboard" class="section active">
+  <div class="hero">
+    <div>
+      <h2>Nexora OS Lite</h2>
+      <p>Tu sistema futurista para organizar proyectos, tareas e ideas.</p>
+    </div>
+    <button class="glow-btn" onclick="showSection('newProject')">Nuevo Proyecto</button>
+  </div>
+
+  <div class="cards">
+    <div class="card"><h3>🚀 Proyectos</h3><p id="totalProjects">0</p></div>
+    <div class="card"><h3>📝 Tareas</h3><p id="totalTasks">0</p></div>
+    <div class="card"><h3>🔥 Productividad</h3><p id="productivity">0%</p></div>
+  </div>
+
+  <h2 class="title">Últimos proyectos</h2>
+  <div id="latestProjects" class="projects-grid"></div>
+</section>
+
+<section id="projects" class="section">
+  <div class="top-bar">
+    <h2 class="title">Tus Proyectos</h2>
+    <button class="glow-btn" onclick="showSection('newProject')">➕ Nuevo</button>
+  </div>
+
+  <div class="filters">
+    <input id="searchInput" placeholder="Buscar proyecto..." oninput="renderProjects()">
+    <select id="statusFilter" onchange="renderProjects()">
+      <option value="Todos">Todos</option>
+      <option value="Idea">Idea</option>
+      <option value="En desarrollo">En desarrollo</option>
+      <option value="Publicado">Publicado</option>
+    </select>
+  </div>
+
+  <div id="projectsGrid" class="projects-grid"></div>
+</section>
+
+<section id="newProject" class="section">
+  <div class="form-box">
+    <h2>Crear Proyecto</h2>
+
+    <input id="projectName" placeholder="Nombre del proyecto">
+    <textarea id="projectDesc" placeholder="Descripción"></textarea>
+
+    <select id="projectStatus">
+      <option>Idea</option>
+      <option>En desarrollo</option>
+      <option>Publicado</option>
+    </select>
+
+    <select id="projectPriority">
+      <option>Baja</option>
+      <option selected>Media</option>
+      <option>Alta</option>
+    </select>
+
+    <input id="projectDate" type="date">
+    <input id="projectGithub" placeholder="Link GitHub">
+    <input id="projectDemo" placeholder="Link Demo">
+
+    <button class="glow-btn" onclick="createProject()">🚀 Crear Proyecto</button>
+  </div>
+</section>
+
+<section id="detail" class="section">
+  <div id="projectDetail"></div>
+</section>
+
+</main>
+
+<script src="app.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+</body>
+</html>

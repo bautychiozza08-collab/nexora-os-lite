@@ -1,0 +1,10 @@
+{
+  "name": "Nexora OS Lite",
+  "short_name": "Nexora",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#00ffae",
+  "description": "Sistema futurista para organizar proyectos, tareas e ideas.",
+  "icons": []
+}
