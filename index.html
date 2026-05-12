@@ -6,408 +6,172 @@
   <title>Nexora OS Lite</title>
 
   <link rel="stylesheet" href="style.css">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 </head>
 
-<body>
-  
-  <div id="loader" class="loader">
-  <h1>NEXORA<span> OS</span></h1>
-  <p>Loading workspace...</p>
-</div>
+<body class="landing-body">
 
-<div id="toastBox" class="toast-box"></div>
+<div class="landing-bg"></div>
 
-<!-- LOGIN -->
+<header class="landing-nav">
+  <div class="landing-logo">NEXORA<span>OS</span></div>
 
-<section id="loginScreen" class="login-screen">
+  <nav>
+    <a href="#features">Features</a>
+    <a href="#ai">IA</a>
+    <a href="#product">Producto</a>
+    <a href="index.html" 
+  </nav>
+</header>
 
-  <div class="login-card">
+<section class="landing-hero">
+
+  <div class="hero-copy">
+    <span class="landing-badge">AI WORKSPACE · FIREBASE · SAAS</span>
 
     <h1>
-      NEXORA<span> OS</span>
+      El workspace futurista para
+      <span>developers & creators.</span>
     </h1>
 
     <p>
-      Ingresá tu nombre para personalizar tu workspace.
+      Organizá proyectos, tareas, ideas y contenido desde una plataforma visual
+      con login real, analytics, IA y experiencia tipo SaaS.
     </p>
 
-    <input
-      id="loginName"
-      placeholder="Ej: Bauti"
-    >
+    <div class="landing-actions">
+      <a href="index.html" class="primary-btn">Entrar a Nexora</a>
+      <a href="https://github.com/bautychiozza08-collab/nexora-os-lite" target="_blank" class="secondary-btn">Ver GitHub</a>
+    </div>
 
-    <button
-      class="glow-btn"
-      onclick="loginLocal()"
-    >
-      Entrar
-    </button>
+    <div class="landing-stats">
+      <div><strong>Firebase</strong><span>Auth real</span></div>
+      <div><strong>AI</strong><span>Assistant</span></div>
+      <div><strong>PWA</strong><span>App feeling</span></div>
+    </div>
+  </div>
 
+  <div class="hero-mockup">
+    <div class="mock-window">
+      <div class="mock-top">
+        <span></span><span></span><span></span>
+      </div>
+
+      <div class="mock-content">
+        <div class="mock-sidebar">
+          <b>NEXORA</b>
+          <p>🏠 Dashboard</p>
+          <p>🚀 Proyectos</p>
+          <p>🎬 Creator</p>
+        </div>
+
+        <div class="mock-main">
+          <div class="mock-card big">
+            <small>NEXORA OS LITE</small>
+            <h3>Hola, Developer 👋</h3>
+            <p>Listo para construir tu próximo proyecto.</p>
+          </div>
+
+          <div class="mock-grid">
+            <div>🚀<b>12</b><span>Proyectos</span></div>
+            <div>✅<b>36</b><span>Tareas</span></div>
+            <div>🔥<b>84%</b><span>Productividad</span></div>
+          </div>
+
+          <div class="mock-ai">
+            🤖 Generando roadmap inteligente...
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </section>
 
-<!-- APP -->
-
-<div class="app hidden" id="app">
-
-  <!-- SIDEBAR -->
-
-  <aside class="sidebar">
-
-    <h1 class="logo">
-      NEXORA
-    </h1>
-
-    <button
-      onclick="showSection('dashboard')"
-      class="nav-btn"
-    >
-      🏠 Dashboard
-    </button>
-
-    <button
-      onclick="showSection('projects')"
-      class="nav-btn"
-    >
-      🚀 Proyectos
-    </button>
-
-    <button
-      onclick="showSection('creator')"
-      class="nav-btn"
-    >
-      🎬 Creator Studio
-    </button>
-
-    <button
-      onclick="exportBackup()"
-      class="nav-btn"
-    >
-      ⬇ Exportar
-    </button>
-
-    <button
-      onclick="logoutLocal()"
-      class="nav-btn"
-    >
-      👤 Cambiar usuario
-    </button>
-
-    <label class="nav-btn import-btn">
-
-      ⬆ Importar
-
-      <input
-        type="file"
-        id="importFile"
-        hidden
-      >
-
-    </label>
-
-  </aside>
-
-  <!-- MAIN -->
-
-  <main class="main-content">
-
-    <!-- DASHBOARD -->
-
-    <section
-      id="dashboardSection"
-      class="page-section"
-    >
-
-      <div class="hero-panel">
-
-        <div>
-
-          <span class="hero-badge">
-            NEXORA OS LITE
-          </span>
-
-          <h1>
-            Hola,
-            <span id="usernameText">
-              Developer
-            </span>
-            👋
-          </h1>
-
-          <p>
-            Listo para construir, organizar y lanzar tu próximo proyecto.
-          </p>
-
-        </div>
-
-        <button
-          class="glow-btn"
-          onclick="showSection('projects')"
-        >
-          + Nuevo Proyecto
-        </button>
-
-      </div>
-
-      <!-- STATS -->
-
-      <div class="stats-grid">
-
-        <div class="stat-card">
-
-          <small>Proyectos activos</small>
-
-          <h3>🚀 Proyectos</h3>
-
-          <div
-            class="stat-number"
-            id="totalProjects"
-          >
-            0
-          </div>
-
-        </div>
-
-        <div class="stat-card">
-
-          <small>Tareas totales</small>
-
-          <h3>📝 Tareas</h3>
-
-          <div
-            class="stat-number"
-            id="totalTasks"
-          >
-            0
-          </div>
-
-        </div>
-
-        <div class="stat-card">
-
-          <small>Avance general</small>
-
-          <h3>🔥 Productividad</h3>
-
-          <div
-            class="stat-number"
-            id="productivity"
-          >
-            0%
-          </div>
-
-        </div>
-
-        <div class="stat-card">
-
-          <small>Creator Studio</small>
-
-          <h3>🎥 Contenido</h3>
-
-          <div
-            class="stat-number"
-            id="totalContents"
-          >
-            0
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- IA -->
-
-      <div class="ai-dashboard-box">
-
-        <div class="panel-title">
-
-          <h2>
-            🤖 Nexora AI Assistant
-          </h2>
-
-          <span>
-            Modo producto
-          </span>
-
-        </div>
-
-        <textarea
-          id="aiPrompt"
-          placeholder="Ej: Quiero crear una app para estudiantes..."
-        ></textarea>
-
-        <div class="actions">
-
-          <button
-            class="mini-btn"
-            onclick="runNexoraAI('idea')"
-          >
-            Generar idea
-          </button>
-
-          <button
-            class="mini-btn"
-            onclick="runNexoraAI('roadmap')"
-          >
-            Roadmap
-          </button>
-
-          <button
-            class="mini-btn"
-            onclick="runNexoraAI('tasks')"
-          >
-            Tareas
-          </button>
-
-          <button
-            class="mini-btn"
-            onclick="runNexoraAI('linkedin')"
-          >
-            Post LinkedIn
-          </button>
-
-        </div>
-
-        <pre
-          id="aiResultBox"
-          class="ai-result-box"
-        ></pre>
-
-      </div>
-
-    </section>
-
-    <!-- PROYECTOS -->
-
-    <section
-      id="projectsSection"
-      class="page-section hidden"
-    >
-
-      <div class="section-title">
-        🚀 Proyectos
-      </div>
-
-      <!-- CREAR PROYECTO -->
-
-      <div class="project-form">
-
-        <input
-          id="projectName"
-          placeholder="Nombre del proyecto"
-        >
-
-        <select id="projectStatus">
-
-          <option>Idea</option>
-          <option>En desarrollo</option>
-          <option>Publicado</option>
-
-        </select>
-
-        <button
-          class="glow-btn"
-          onclick="addProject()"
-        >
-          Crear proyecto
-        </button>
-
-      </div>
-
-      <!-- FILTROS -->
-
-      <div class="filters">
-
-        <input
-          id="projectSearch"
-          placeholder="Buscar proyecto..."
-          oninput="renderProjects()"
-        >
-
-        <select
-          id="projectFilter"
-          onchange="renderProjects()"
-        >
-
-          <option value="Todos">
-            Todos
-          </option>
-
-          <option value="Idea">
-            Idea
-          </option>
-
-          <option value="En desarrollo">
-            En desarrollo
-          </option>
-
-          <option value="Publicado">
-            Publicado
-          </option>
-
-        </select>
-
-        <button
-          class="glow-btn"
-          onclick="loadDemoData()"
-        >
-          ⚡ Cargar demo
-        </button>
-
-      </div>
-
-      <!-- GRID -->
-
-      <div
-        id="projectsContainer"
-        class="cards-grid"
-      ></div>
-
-    </section>
-
-    <!-- CREATOR -->
-
-    <section
-      id="creatorSection"
-      class="page-section hidden"
-    >
-
-      <div class="section-title">
-        🎬 Creator Studio
-      </div>
-
-      <div class="project-form">
-
-        <input
-          id="contentTitle"
-          placeholder="Idea de contenido"
-        >
-
-        <button
-          class="glow-btn"
-          onclick="addContent()"
-        >
-          Guardar idea
-        </button>
-
-      </div>
-
-      <div
-        id="creatorContainer"
-        class="cards-grid"
-      ></div>
-
-    </section>
-
-  </main>
-
-</div>
-
-<script type="module" src="app.js"></script>
+<section id="features" class="landing-features">
+
+  <div class="landing-card">
+    <h3>🚀 Proyectos</h3>
+    <p>Creá proyectos, agregá tareas, medí progreso y organizá estados.</p>
+  </div>
+
+  <div class="landing-card">
+    <h3>🎬 Creator Studio</h3>
+    <p>Guardá ideas de contenido y prepará posts para redes.</p>
+  </div>
+
+  <div class="landing-card">
+    <h3>📊 Analytics</h3>
+    <p>Visualizá tareas, productividad y progreso desde un dashboard moderno.</p>
+  </div>
+
+</section>
+
+<section id="ai" class="landing-section split">
+
+  <div>
+    <span class="landing-badge">POWERED BY AI</span>
+    <h2>Tu asistente para construir más rápido.</h2>
+    <p>
+      Nexora AI ayuda a generar ideas, roadmaps, tareas y publicaciones para LinkedIn.
+      Ideal para transformar una idea en producto real.
+    </p>
+  </div>
+
+  <div class="ai-terminal">
+<pre>prompt: "Crear app para estudiantes"
+
+Nexora AI:
+✓ Idea SaaS generada
+✓ Roadmap creado
+✓ Tareas sugeridas
+✓ Post LinkedIn listo</pre>
+  </div>
+
+</section>
+
+<section id="product" class="landing-section center">
+  <span class="landing-badge">PRODUCT READY</span>
+
+  <h2>De proyecto a producto.</h2>
+
+  <p>
+    Nexora OS Lite combina frontend, Firebase Auth, diseño UI/UX,
+    productividad y una experiencia moderna lista para portfolio.
+  </p>
+</section>
+
+<section class="pricing">
+
+  <div class="price-card">
+    <h3>Lite</h3>
+    <p>Para organizar proyectos personales.</p>
+    <strong>$0</strong>
+    <span>Dashboard + tareas + backup</span>
+  </div>
+
+  <div class="price-card featured">
+    <h3>Creator</h3>
+    <p>Para developers y creadores.</p>
+    <strong>PRO</strong>
+    <span>IA + Creator Studio + Analytics</span>
+  </div>
+
+  <div class="price-card">
+    <h3>Cloud</h3>
+    <p>Para equipos y usuarios reales.</p>
+    <strong>Firebase</strong>
+    <span>Auth + Sync + Multiusuario</span>
+  </div>
+
+</section>
+
+<section class="landing-cta">
+  <h2>Construí tu workspace futurista.</h2>
+  <p>Entrá, probalo y convertí tus ideas en proyectos reales.</p>
+  <a href="index.html">Abrir Nexora OS Lite</a>
+</section>
 
 </body>
 </html>

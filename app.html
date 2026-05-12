@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexora OS Lite</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  
+  <div id="loader" class="loader">
+  <h1>NEXORA<span> OS</span></h1>
+  <p>Loading workspace...</p>
+</div>
+
+<div id="toastBox" class="toast-box"></div>
+
+<!-- LOGIN -->
+
+<section id="loginScreen" class="login-screen">
+
+  <div class="login-card">
+
+    <h1>
+      NEXORA<span> OS</span>
+    </h1>
+
+    <p>
+      Ingresá tu nombre para personalizar tu workspace.
+    </p>
+
+    <input
+      id="loginName"
+      placeholder="Ej: Bauti"
+    >
+
+    <button
+      class="glow-btn"
+      onclick="loginLocal()"
+    >
+      Entrar
+    </button>
+
+  </div>
+
+</section>
+
+<!-- APP -->
+
+<div class="app hidden" id="app">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+
+    <h1 class="logo">
+      NEXORA
+    </h1>
+
+    <button
+      onclick="showSection('dashboard')"
+      class="nav-btn"
+    >
+      🏠 Dashboard
+    </button>
+
+    <button
+      onclick="showSection('projects')"
+      class="nav-btn"
+    >
+      🚀 Proyectos
+    </button>
+
+    <button
+      onclick="showSection('creator')"
+      class="nav-btn"
+    >
+      🎬 Creator Studio
+    </button>
+
+    <button
+      onclick="exportBackup()"
+      class="nav-btn"
+    >
+      ⬇ Exportar
+    </button>
+
+    <button
+      onclick="logoutLocal()"
+      class="nav-btn"
+    >
+      👤 Cambiar usuario
+    </button>
+
+    <label class="nav-btn import-btn">
+
+      ⬆ Importar
+
+      <input
+        type="file"
+        id="importFile"
+        hidden
+      >
+
+    </label>
+
+  </aside>
+
+  <!-- MAIN -->
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+
+    <section
+      id="dashboardSection"
+      class="page-section"
+    >
+
+      <div class="hero-panel">
+
+        <div>
+
+          <span class="hero-badge">
+            NEXORA OS LITE
+          </span>
+
+          <h1>
+            Hola,
+            <span id="usernameText">
+              Developer
+            </span>
+            👋
+          </h1>
+
+          <p>
+            Listo para construir, organizar y lanzar tu próximo proyecto.
+          </p>
+
+        </div>
+
+        <button
+          class="glow-btn"
+          onclick="showSection('projects')"
+        >
+          + Nuevo Proyecto
+        </button>
+
+      </div>
+
+      <!-- STATS -->
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+
+          <small>Proyectos activos</small>
+
+          <h3>🚀 Proyectos</h3>
+
+          <div
+            class="stat-number"
+            id="totalProjects"
+          >
+            0
+          </div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <small>Tareas totales</small>
+
+          <h3>📝 Tareas</h3>
+
+          <div
+            class="stat-number"
+            id="totalTasks"
+          >
+            0
+          </div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <small>Avance general</small>
+
+          <h3>🔥 Productividad</h3>
+
+          <div
+            class="stat-number"
+            id="productivity"
+          >
+            0%
+          </div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <small>Creator Studio</small>
+
+          <h3>🎥 Contenido</h3>
+
+          <div
+            class="stat-number"
+            id="totalContents"
+          >
+            0
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- IA -->
+
+      <div class="ai-dashboard-box">
+
+        <div class="panel-title">
+
+          <h2>
+            🤖 Nexora AI Assistant
+          </h2>
+
+          <span>
+            Modo producto
+          </span>
+
+        </div>
+
+        <textarea
+          id="aiPrompt"
+          placeholder="Ej: Quiero crear una app para estudiantes..."
+        ></textarea>
+
+        <div class="actions">
+
+          <button
+            class="mini-btn"
+            onclick="runNexoraAI('idea')"
+          >
+            Generar idea
+          </button>
+
+          <button
+            class="mini-btn"
+            onclick="runNexoraAI('roadmap')"
+          >
+            Roadmap
+          </button>
+
+          <button
+            class="mini-btn"
+            onclick="runNexoraAI('tasks')"
+          >
+            Tareas
+          </button>
+
+          <button
+            class="mini-btn"
+            onclick="runNexoraAI('linkedin')"
+          >
+            Post LinkedIn
+          </button>
+
+        </div>
+
+        <pre
+          id="aiResultBox"
+          class="ai-result-box"
+        ></pre>
+
+      </div>
+
+    </section>
+
+    <!-- PROYECTOS -->
+
+    <section
+      id="projectsSection"
+      class="page-section hidden"
+    >
+
+      <div class="section-title">
+        🚀 Proyectos
+      </div>
+
+      <!-- CREAR PROYECTO -->
+
+      <div class="project-form">
+
+        <input
+          id="projectName"
+          placeholder="Nombre del proyecto"
+        >
+
+        <select id="projectStatus">
+
+          <option>Idea</option>
+          <option>En desarrollo</option>
+          <option>Publicado</option>
+
+        </select>
+
+        <button
+          class="glow-btn"
+          onclick="addProject()"
+        >
+          Crear proyecto
+        </button>
+
+      </div>
+
+      <!-- FILTROS -->
+
+      <div class="filters">
+
+        <input
+          id="projectSearch"
+          placeholder="Buscar proyecto..."
+          oninput="renderProjects()"
+        >
+
+        <select
+          id="projectFilter"
+          onchange="renderProjects()"
+        >
+
+          <option value="Todos">
+            Todos
+          </option>
+
+          <option value="Idea">
+            Idea
+          </option>
+
+          <option value="En desarrollo">
+            En desarrollo
+          </option>
+
+          <option value="Publicado">
+            Publicado
+          </option>
+
+        </select>
+
+        <button
+          class="glow-btn"
+          onclick="loadDemoData()"
+        >
+          ⚡ Cargar demo
+        </button>
+
+      </div>
+
+      <!-- GRID -->
+
+      <div
+        id="projectsContainer"
+        class="cards-grid"
+      ></div>
+
+    </section>
+
+    <!-- CREATOR -->
+
+    <section
+      id="creatorSection"
+      class="page-section hidden"
+    >
+
+      <div class="section-title">
+        🎬 Creator Studio
+      </div>
+
+      <div class="project-form">
+
+        <input
+          id="contentTitle"
+          placeholder="Idea de contenido"
+        >
+
+        <button
+          class="glow-btn"
+          onclick="addContent()"
+        >
+          Guardar idea
+        </button>
+
+      </div>
+
+      <div
+        id="creatorContainer"
+        class="cards-grid"
+      ></div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
