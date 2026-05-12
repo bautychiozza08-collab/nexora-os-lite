@@ -8,6 +8,13 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 /* FIREBASE */
 
 const firebaseConfig = {
@@ -22,6 +29,7 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 /* STATE */
 
@@ -33,48 +41,56 @@ let contents = [];
 
 function setupLoginUI(){
   const loginCard = document.querySelector(".login-card");
-
   if(!loginCard) return;
 
   loginCard.innerHTML = `
     <h1>NEXORA<span> OS</span></h1>
-
     <p>Iniciá sesión o registrate para guardar tu workspace.</p>
 
     <input id="authEmail" type="email" placeholder="Email">
     <input id="authPassword" type="password" placeholder="Contraseña">
 
-    <button class="glow-btn" onclick="loginFirebase()">
-      Entrar
-    </button>
-
-    <button class="mini-btn" onclick="registerFirebase()">
-      Crear cuenta
-    </button>
+    <button class="glow-btn" onclick="loginFirebase()">Entrar</button>
+    <button class="mini-btn" onclick="registerFirebase()">Crear cuenta</button>
   `;
 }
 
-/* STORAGE POR USUARIO */
+/* FIRESTORE */
 
-function userProjectsKey(){
-  return `nexoraProjects_${currentUser.uid}`;
+async function loadUserData(){
+  if(!currentUser) return;
+
+  const ref = doc(db, "users", currentUser.uid);
+  const snap = await getDoc(ref);
+
+  if(snap.exists()){
+    const data = snap.data();
+    projects = data.projects || [];
+    contents = data.contents || [];
+  }else{
+    projects = [];
+    contents = [];
+
+    await setDoc(ref, {
+      email: currentUser.email,
+      projects: [],
+      contents: [],
+      updatedAt: new Date().toISOString()
+    });
+  }
 }
 
-function userContentsKey(){
-  return `nexoraContents_${currentUser.uid}`;
-}
+async function saveCloudData(){
+  if(!currentUser) return;
 
-function loadUserData(){
-  projects = JSON.parse(localStorage.getItem(userProjectsKey())) || [];
-  contents = JSON.parse(localStorage.getItem(userContentsKey())) || [];
-}
+  const ref = doc(db, "users", currentUser.uid);
 
-function saveProjects(){
-  localStorage.setItem(userProjectsKey(), JSON.stringify(projects));
-}
-
-function saveContents(){
-  localStorage.setItem(userContentsKey(), JSON.stringify(contents));
+  await setDoc(ref, {
+    email: currentUser.email,
+    projects,
+    contents,
+    updatedAt: new Date().toISOString()
+  });
 }
 
 /* AUTH */
@@ -84,14 +100,15 @@ window.registerFirebase = async function(){
   const password = document.getElementById("authPassword").value.trim();
 
   if(!email || !password){
-    alert("Completá email y contraseña");
+    toast("Completá email y contraseña");
     return;
   }
 
   try{
     await createUserWithEmailAndPassword(auth, email, password);
+    toast("Cuenta creada 🚀");
   }catch(error){
-    alert("Error al crear cuenta: " + error.message);
+    toast("Error: " + error.message);
   }
 };
 
@@ -100,22 +117,24 @@ window.loginFirebase = async function(){
   const password = document.getElementById("authPassword").value.trim();
 
   if(!email || !password){
-    alert("Completá email y contraseña");
+    toast("Completá email y contraseña");
     return;
   }
 
   try{
     await signInWithEmailAndPassword(auth, email, password);
+    toast("Sesión iniciada ✅");
   }catch(error){
-    alert("Error al iniciar sesión: " + error.message);
+    toast("Error: " + error.message);
   }
 };
 
 window.logoutLocal = async function(){
   await signOut(auth);
+  location.reload();
 };
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   const loginScreen = document.getElementById("loginScreen");
   const app = document.getElementById("app");
 
@@ -125,7 +144,7 @@ onAuthStateChanged(auth, user => {
     loginScreen.classList.add("hidden");
     app.classList.remove("hidden");
 
-    loadUserData();
+    await loadUserData();
 
     const usernameText = document.getElementById("usernameText");
     if(usernameText){
@@ -143,7 +162,7 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-/* SECCIONES */
+/* SECTIONS */
 
 window.showSection = function(section){
   document.querySelectorAll(".page-section").forEach(sec => {
@@ -165,9 +184,9 @@ window.showSection = function(section){
   renderAll();
 };
 
-/* PROYECTOS */
+/* PROJECTS */
 
-window.addProject = function(){
+window.addProject = async function(){
   const nameInput = document.getElementById("projectName");
   const statusInput = document.getElementById("projectStatus");
 
@@ -175,7 +194,7 @@ window.addProject = function(){
   const status = statusInput.value;
 
   if(!name){
-    alert("Escribí el nombre del proyecto");
+    toast("Escribí el nombre del proyecto");
     return;
   }
 
@@ -186,29 +205,32 @@ window.addProject = function(){
     tasks: []
   });
 
-  saveProjects();
+  await saveCloudData();
 
   nameInput.value = "";
 
   renderAll();
+  toast("Proyecto creado 🚀");
 };
 
-window.deleteProject = function(id){
+window.deleteProject = async function(id){
   projects = projects.filter(project => project.id !== id);
-  saveProjects();
+  await saveCloudData();
   renderAll();
+  toast("Proyecto eliminado");
 };
 
-window.addTask = function(projectId){
+window.addTask = async function(projectId){
   const input = document.getElementById(`taskInput-${projectId}`);
   const text = input.value.trim();
 
   if(!text){
-    alert("Escribí una tarea");
+    toast("Escribí una tarea");
     return;
   }
 
   const project = projects.find(p => p.id === projectId);
+  if(!project) return;
 
   project.tasks.push({
     id: Date.now(),
@@ -216,27 +238,34 @@ window.addTask = function(projectId){
     done: false
   });
 
-  saveProjects();
+  await saveCloudData();
+
   renderAll();
+  toast("Tarea agregada ✅");
 };
 
-window.toggleTask = function(projectId, taskId){
+window.toggleTask = async function(projectId, taskId){
   const project = projects.find(p => p.id === projectId);
+  if(!project) return;
+
   const task = project.tasks.find(t => t.id === taskId);
+  if(!task) return;
 
   task.done = !task.done;
 
-  saveProjects();
+  await saveCloudData();
   renderAll();
 };
 
-window.deleteTask = function(projectId, taskId){
+window.deleteTask = async function(projectId, taskId){
   const project = projects.find(p => p.id === projectId);
+  if(!project) return;
 
   project.tasks = project.tasks.filter(t => t.id !== taskId);
 
-  saveProjects();
+  await saveCloudData();
   renderAll();
+  toast("Tarea eliminada");
 };
 
 function renderProjects(){
@@ -246,11 +275,11 @@ function renderProjects(){
   const search = document.getElementById("projectSearch")?.value.toLowerCase() || "";
   const filter = document.getElementById("projectFilter")?.value || "Todos";
 
-  container.innerHTML = "";
-
   const filteredProjects = projects
     .filter(project => project.name.toLowerCase().includes(search))
     .filter(project => filter === "Todos" || project.status === filter);
+
+  container.innerHTML = "";
 
   if(filteredProjects.length === 0){
     container.innerHTML = `
@@ -291,9 +320,7 @@ function renderProjects(){
                 ${task.done ? "✅" : "⬜"} ${task.text}
               </span>
 
-              <button onclick="deleteTask(${project.id}, ${task.id})">
-                ✕
-              </button>
+              <button onclick="deleteTask(${project.id}, ${task.id})">✕</button>
             </div>
           `).join("")}
         </div>
@@ -308,12 +335,12 @@ function renderProjects(){
 
 /* CREATOR */
 
-window.addContent = function(){
+window.addContent = async function(){
   const input = document.getElementById("contentTitle");
   const title = input.value.trim();
 
   if(!title){
-    alert("Escribí una idea de contenido");
+    toast("Escribí una idea de contenido");
     return;
   }
 
@@ -323,17 +350,19 @@ window.addContent = function(){
     status: "Idea"
   });
 
-  saveContents();
+  await saveCloudData();
 
   input.value = "";
 
   renderAll();
+  toast("Idea guardada 🎬");
 };
 
-window.deleteContent = function(id){
+window.deleteContent = async function(id){
   contents = contents.filter(content => content.id !== id);
-  saveContents();
+  await saveCloudData();
   renderAll();
+  toast("Idea eliminada");
 };
 
 function renderCreator(){
@@ -372,6 +401,7 @@ function renderDashboard(){
   const totalProjects = projects.length;
   const totalContents = contents.length;
   const totalTasks = projects.reduce((acc, p) => acc + p.tasks.length, 0);
+
   const completedTasks = projects.reduce(
     (acc, p) => acc + p.tasks.filter(t => t.done).length,
     0
@@ -392,7 +422,7 @@ function setText(id, value){
   if(el) el.innerText = value;
 }
 
-/* IA */
+/* AI */
 
 window.runNexoraAI = function(type){
   const promptInput = document.getElementById("aiPrompt");
@@ -403,7 +433,7 @@ window.runNexoraAI = function(type){
   const prompt = promptInput.value.trim();
 
   if(!prompt){
-    alert("Escribí una idea primero");
+    toast("Escribí una idea primero");
     return;
   }
 
@@ -420,7 +450,8 @@ Funciones clave:
 • Tareas reales
 • Analytics visuales
 • Creator Studio
-• Exportar/importar datos`;
+• Exportar/importar datos
+• Firebase Cloud Sync`;
   }
 
   if(type === "roadmap"){
@@ -430,9 +461,10 @@ Fase 1: Definir objetivo del producto
 Fase 2: Crear landing page
 Fase 3: Construir dashboard
 Fase 4: Agregar tareas reales
-Fase 5: Mejorar UI/UX
-Fase 6: Publicar en GitHub Pages
-Fase 7: Presentarlo en LinkedIn`;
+Fase 5: Guardar en Firestore
+Fase 6: Mejorar UI/UX
+Fase 7: Publicar en GitHub Pages
+Fase 8: Presentarlo en LinkedIn`;
   }
 
   if(type === "tasks"){
@@ -442,8 +474,8 @@ Fase 7: Presentarlo en LinkedIn`;
 2. Diseñar interfaz principal
 3. Crear tareas reales
 4. Agregar progreso por proyecto
-5. Mejorar responsive
-6. Exportar backup
+5. Guardar datos en Firestore
+6. Mejorar responsive
 7. Publicar online`;
   }
 
@@ -452,7 +484,7 @@ Fase 7: Presentarlo en LinkedIn`;
 
 Una plataforma web moderna para organizar proyectos, tareas, contenido y productividad.
 
-Este proyecto combina JavaScript, diseño UI/UX, lógica frontend, localStorage y Firebase Auth.
+Este proyecto combina JavaScript, diseño UI/UX, Firebase Auth, Firestore y una experiencia visual tipo SaaS.
 
 #JavaScript #Firebase #Frontend #WebDevelopment #Developer`;
   }
@@ -462,6 +494,7 @@ Este proyecto combina JavaScript, diseño UI/UX, lógica frontend, localStorage 
 
 function typeWriter(element, text){
   element.innerText = "";
+
   let i = 0;
 
   const interval = setInterval(() => {
@@ -493,6 +526,8 @@ window.exportBackup = function(){
   a.click();
 
   URL.revokeObjectURL(url);
+
+  toast("Backup exportado 📦");
 };
 
 document.addEventListener("change", function(e){
@@ -503,21 +538,20 @@ document.addEventListener("change", function(e){
 
   const reader = new FileReader();
 
-  reader.onload = function(event){
+  reader.onload = async function(event){
     try{
       const data = JSON.parse(event.target.result);
 
       projects = data.projects || [];
       contents = data.contents || [];
 
-      saveProjects();
-      saveContents();
+      await saveCloudData();
 
       renderAll();
 
       toast("Backup importado correctamente 🚀");
     }catch{
-      alert("Archivo inválido");
+      toast("Archivo inválido");
     }
   };
 
@@ -526,7 +560,7 @@ document.addEventListener("change", function(e){
 
 /* DEMO */
 
-window.loadDemoData = function(){
+window.loadDemoData = async function(){
   projects = [
     {
       id: Date.now() + 1,
@@ -535,7 +569,8 @@ window.loadDemoData = function(){
       tasks: [
         { id: 1, text: "Crear dashboard", done: true },
         { id: 2, text: "Agregar Firebase Auth", done: true },
-        { id: 3, text: "Publicar en GitHub Pages", done: true }
+        { id: 3, text: "Conectar Firestore", done: true },
+        { id: 4, text: "Publicar en GitHub Pages", done: true }
       ]
     },
     {
@@ -543,8 +578,8 @@ window.loadDemoData = function(){
       name: "Creator Studio",
       status: "En desarrollo",
       tasks: [
-        { id: 4, text: "Diseñar calendario", done: true },
-        { id: 5, text: "Generar ideas de contenido", done: false }
+        { id: 5, text: "Diseñar calendario", done: true },
+        { id: 6, text: "Generar ideas de contenido", done: false }
       ]
     },
     {
@@ -552,8 +587,8 @@ window.loadDemoData = function(){
       name: "Portfolio Futurista",
       status: "Idea",
       tasks: [
-        { id: 6, text: "Crear landing", done: false },
-        { id: 7, text: "Agregar animaciones", done: false }
+        { id: 7, text: "Crear landing", done: false },
+        { id: 8, text: "Agregar animaciones", done: false }
       ]
     }
   ];
@@ -563,13 +598,44 @@ window.loadDemoData = function(){
     { id: Date.now() + 5, title: "Video mostrando dashboard", status: "En producción" }
   ];
 
-  saveProjects();
-  saveContents();
+  await saveCloudData();
 
   renderAll();
 
   toast("Demo cargada 🚀");
 };
+
+/* TOAST */
+
+function toast(message){
+  const toastBox = document.getElementById("toastBox");
+  if(!toastBox){
+    console.log(message);
+    return;
+  }
+
+  const div = document.createElement("div");
+  div.className = "toast";
+  div.innerText = message;
+
+  toastBox.appendChild(div);
+
+  setTimeout(() => {
+    div.remove();
+  }, 3000);
+}
+
+/* LOADER */
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const loader = document.getElementById("loader");
+    if(loader){
+      loader.classList.add("hidden");
+      loader.style.display = "none";
+    }
+  }, 1200);
+});
 
 /* RENDER */
 
@@ -582,26 +648,3 @@ function renderAll(){
 /* START */
 
 setupLoginUI();
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    const loader = document.getElementById("loader");
-    if(loader){
-      loader.style.display = "none";
-    }
-  }, 1200);
-});
-
-function toast(message){
-  const toastBox = document.getElementById("toastBox");
-  if(!toastBox) return;
-
-  const div = document.createElement("div");
-  div.className = "toast";
-  div.innerText = message;
-
-  toastBox.appendChild(div);
-
-  setTimeout(() => {
-    div.remove();
-  }, 3000);
-}
