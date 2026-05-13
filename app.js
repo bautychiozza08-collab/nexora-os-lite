@@ -652,3 +652,20 @@ window.showSection = function(section){
 
   event.target.classList.add("active");
 };
+document.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.getElementById("loginBtn");
+  const registerBtn = document.getElementById("registerBtn");
+  const generateBtn = document.getElementById("generateIdea");
+
+  if(loginBtn){
+    loginBtn.addEventListener("click", login);
+  }
+
+  if(registerBtn){
+    registerBtn.addEventListener("click", register);
+  }
+
+  if(generateBtn){
+    generateBtn.addEventListener("click", generateAIResponse);
+  }
+});
