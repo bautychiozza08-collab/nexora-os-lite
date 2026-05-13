@@ -37,22 +37,42 @@ let currentUser = null;
 let projects = [];
 let contents = [];
 
-/* LOGIN UI */
+/* HELPERS */
 
-function setupLoginUI(){
-  const loginCard = document.querySelector(".login-card");
-  if(!loginCard) return;
+function $(id){
+  return document.getElementById(id);
+}
 
-  loginCard.innerHTML = `
-    <h1>NEXORA<span> OS</span></h1>
-    <p>Iniciá sesión o registrate para guardar tu workspace.</p>
+function toast(message){
+  const box = $("toastBox");
 
-    <input id="authEmail" type="email" placeholder="Email">
-    <input id="authPassword" type="password" placeholder="Contraseña">
+  if(!box){
+    console.log(message);
+    return;
+  }
 
-    <button class="glow-btn" onclick="loginFirebase()">Entrar</button>
-    <button class="mini-btn" onclick="registerFirebase()">Crear cuenta</button>
-  `;
+  const div = document.createElement("div");
+  div.className = "toast";
+  div.innerText = message;
+
+  box.appendChild(div);
+
+  setTimeout(() => {
+    div.remove();
+  }, 3000);
+}
+
+function setText(id, value){
+  const el = $(id);
+  if(el) el.innerText = value;
+}
+
+function show(el){
+  if(el) el.classList.remove("hidden");
+}
+
+function hide(el){
+  if(el) el.classList.add("hidden");
 }
 
 /* FIRESTORE */
@@ -73,8 +93,8 @@ async function loadUserData(){
 
     await setDoc(ref, {
       email: currentUser.email,
-      projects: [],
-      contents: [],
+      projects,
+      contents,
       updatedAt: new Date().toISOString()
     });
   }
@@ -95,9 +115,9 @@ async function saveCloudData(){
 
 /* AUTH */
 
-window.registerFirebase = async function(){
-  const email = document.getElementById("authEmail").value.trim();
-  const password = document.getElementById("authPassword").value.trim();
+async function register(){
+  const email = ($("authEmail") || $("email"))?.value.trim();
+  const password = ($("authPassword") || $("password"))?.value.trim();
 
   if(!email || !password){
     toast("Completá email y contraseña");
@@ -110,11 +130,11 @@ window.registerFirebase = async function(){
   }catch(error){
     toast("Error: " + error.message);
   }
-};
+}
 
-window.loginFirebase = async function(){
-  const email = document.getElementById("authEmail").value.trim();
-  const password = document.getElementById("authPassword").value.trim();
+async function login(){
+  const email = ($("authEmail") || $("email"))?.value.trim();
+  const password = ($("authPassword") || $("password"))?.value.trim();
 
   if(!email || !password){
     toast("Completá email y contraseña");
@@ -127,26 +147,32 @@ window.loginFirebase = async function(){
   }catch(error){
     toast("Error: " + error.message);
   }
-};
+}
 
-window.logoutLocal = async function(){
+async function logoutLocal(){
   await signOut(auth);
   location.reload();
-};
+}
+
+window.register = register;
+window.login = login;
+window.registerFirebase = register;
+window.loginFirebase = login;
+window.logoutLocal = logoutLocal;
 
 onAuthStateChanged(auth, async user => {
-  const loginScreen = document.getElementById("loginScreen");
-  const app = document.getElementById("app");
+  const loginScreen = $("loginScreen");
+  const app = $("app") || $("appScreen");
 
   if(user){
     currentUser = user;
 
-    loginScreen.classList.add("hidden");
-    app.classList.remove("hidden");
+    hide(loginScreen);
+    show(app);
 
     await loadUserData();
 
-    const usernameText = document.getElementById("usernameText");
+    const usernameText = $("usernameText");
     if(usernameText){
       usernameText.innerText = user.email.split("@")[0];
     }
@@ -157,41 +183,44 @@ onAuthStateChanged(auth, async user => {
     projects = [];
     contents = [];
 
-    loginScreen.classList.remove("hidden");
-    app.classList.add("hidden");
+    show(loginScreen);
+    hide(app);
   }
 });
 
 /* SECTIONS */
 
-window.showSection = function(section){
-  document.querySelectorAll(".page-section").forEach(sec => {
-    sec.classList.add("hidden");
+function showSection(section){
+  const dashboard = $("dashboardSection");
+  const projectsSection = $("projectsSection");
+  const creator = $("creatorSection");
+
+  [dashboard, projectsSection, creator].forEach(sec => {
+    if(sec) sec.classList.add("hidden");
   });
 
-  if(section === "dashboard"){
-    document.getElementById("dashboardSection").classList.remove("hidden");
-  }
-
-  if(section === "projects"){
-    document.getElementById("projectsSection").classList.remove("hidden");
-  }
-
-  if(section === "creator"){
-    document.getElementById("creatorSection").classList.remove("hidden");
-  }
+  if(section === "dashboard") show(dashboard);
+  if(section === "projects") show(projectsSection);
+  if(section === "creator") show(creator);
 
   renderAll();
-};
+}
+
+window.showSection = showSection;
 
 /* PROJECTS */
 
-window.addProject = async function(){
-  const nameInput = document.getElementById("projectName");
-  const statusInput = document.getElementById("projectStatus");
+async function addProject(){
+  const nameInput = $("projectName") || $("projectInput");
+  const statusInput = $("projectStatus");
+
+  if(!nameInput){
+    toast("No encontré el input de proyecto");
+    return;
+  }
 
   const name = nameInput.value.trim();
-  const status = statusInput.value;
+  const status = statusInput ? statusInput.value : "Idea";
 
   if(!name){
     toast("Escribí el nombre del proyecto");
@@ -205,23 +234,27 @@ window.addProject = async function(){
     tasks: []
   });
 
-  await saveCloudData();
-
   nameInput.value = "";
 
-  renderAll();
-  toast("Proyecto creado 🚀");
-};
-
-window.deleteProject = async function(id){
-  projects = projects.filter(project => project.id !== id);
   await saveCloudData();
   renderAll();
-  toast("Proyecto eliminado");
-};
 
-window.addTask = async function(projectId){
-  const input = document.getElementById(`taskInput-${projectId}`);
+  toast("Proyecto creado 🚀");
+}
+
+async function deleteProject(id){
+  projects = projects.filter(project => project.id !== id);
+
+  await saveCloudData();
+  renderAll();
+
+  toast("Proyecto eliminado");
+}
+
+async function addTask(projectId){
+  const input = $(`taskInput-${projectId}`);
+  if(!input) return;
+
   const text = input.value.trim();
 
   if(!text){
@@ -239,12 +272,12 @@ window.addTask = async function(projectId){
   });
 
   await saveCloudData();
-
   renderAll();
-  toast("Tarea agregada ✅");
-};
 
-window.toggleTask = async function(projectId, taskId){
+  toast("Tarea agregada ✅");
+}
+
+async function toggleTask(projectId, taskId){
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
 
@@ -255,9 +288,9 @@ window.toggleTask = async function(projectId, taskId){
 
   await saveCloudData();
   renderAll();
-};
+}
 
-window.deleteTask = async function(projectId, taskId){
+async function deleteTask(projectId, taskId){
   const project = projects.find(p => p.id === projectId);
   if(!project) return;
 
@@ -265,23 +298,23 @@ window.deleteTask = async function(projectId, taskId){
 
   await saveCloudData();
   renderAll();
+
   toast("Tarea eliminada");
-};
+}
+
+window.addProject = addProject;
+window.deleteProject = deleteProject;
+window.addTask = addTask;
+window.toggleTask = toggleTask;
+window.deleteTask = deleteTask;
 
 function renderProjects(){
-  const container = document.getElementById("projectsContainer");
+  const container = $("projectsContainer") || $("projectsList");
   if(!container) return;
-
-  const search = document.getElementById("projectSearch")?.value.toLowerCase() || "";
-  const filter = document.getElementById("projectFilter")?.value || "Todos";
-
-  const filteredProjects = projects
-    .filter(project => project.name.toLowerCase().includes(search))
-    .filter(project => filter === "Todos" || project.status === filter);
 
   container.innerHTML = "";
 
-  if(filteredProjects.length === 0){
+  if(projects.length === 0){
     container.innerHTML = `
       <div class="project-card">
         <h3>🚀 Sin proyectos</h3>
@@ -291,9 +324,9 @@ function renderProjects(){
     return;
   }
 
-  filteredProjects.forEach(project => {
-    const doneTasks = project.tasks.filter(t => t.done).length;
+  projects.forEach(project => {
     const totalTasks = project.tasks.length;
+    const doneTasks = project.tasks.filter(t => t.done).length;
     const progress = totalTasks ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
     container.innerHTML += `
@@ -335,8 +368,14 @@ function renderProjects(){
 
 /* CREATOR */
 
-window.addContent = async function(){
-  const input = document.getElementById("contentTitle");
+async function addContent(){
+  const input = $("contentTitle");
+
+  if(!input){
+    toast("No encontré el input de contenido");
+    return;
+  }
+
   const title = input.value.trim();
 
   if(!title){
@@ -350,23 +389,28 @@ window.addContent = async function(){
     status: "Idea"
   });
 
-  await saveCloudData();
-
   input.value = "";
 
-  renderAll();
-  toast("Idea guardada 🎬");
-};
-
-window.deleteContent = async function(id){
-  contents = contents.filter(content => content.id !== id);
   await saveCloudData();
   renderAll();
+
+  toast("Idea guardada 🎬");
+}
+
+async function deleteContent(id){
+  contents = contents.filter(content => content.id !== id);
+
+  await saveCloudData();
+  renderAll();
+
   toast("Idea eliminada");
-};
+}
+
+window.addContent = addContent;
+window.deleteContent = deleteContent;
 
 function renderCreator(){
-  const container = document.getElementById("creatorContainer");
+  const container = $("creatorContainer");
   if(!container) return;
 
   container.innerHTML = "";
@@ -400,120 +444,88 @@ function renderCreator(){
 function renderDashboard(){
   const totalProjects = projects.length;
   const totalContents = contents.length;
-  const totalTasks = projects.reduce((acc, p) => acc + p.tasks.length, 0);
 
-  const completedTasks = projects.reduce(
-    (acc, p) => acc + p.tasks.filter(t => t.done).length,
-    0
-  );
+  const totalTasks = projects.reduce((acc, p) => {
+    return acc + p.tasks.length;
+  }, 0);
+
+  const completedTasks = projects.reduce((acc, p) => {
+    return acc + p.tasks.filter(t => t.done).length;
+  }, 0);
 
   const productivity = totalTasks
     ? Math.round((completedTasks / totalTasks) * 100)
     : 0;
 
   setText("totalProjects", totalProjects);
+  setText("projectCount", totalProjects);
+
   setText("totalTasks", totalTasks);
+  setText("tasksCount", totalTasks);
+
   setText("productivity", productivity + "%");
   setText("totalContents", totalContents);
 }
 
-function setText(id, value){
-  const el = document.getElementById(id);
-  if(el) el.innerText = value;
-}
+/* AI REAL */
 
-/* AI */
+async function generateAIResponse(){
+  const aiInput = $("aiInput");
+  const aiResult = $("aiResult");
 
-window.runNexoraAI = function(type){
-  const promptInput = document.getElementById("aiPrompt");
-  const resultBox = document.getElementById("aiResultBox");
+  if(!aiInput || !aiResult){
+    toast("No encontré la sección de IA");
+    return;
+  }
 
-  if(!promptInput || !resultBox) return;
-
-  const prompt = promptInput.value.trim();
+  const prompt = aiInput.value.trim();
 
   if(!prompt){
     toast("Escribí una idea primero");
     return;
   }
 
-  let result = "";
+  aiResult.innerHTML = "Generando respuesta...";
 
-  if(type === "idea"){
-    result = `💡 Idea SaaS generada:
+  try{
+    const response = await fetch("https://nexora-ai-api.vercel.app/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        prompt,
+        type: "idea"
+      })
+    });
 
-Crear una plataforma llamada "${prompt}" enfocada en productividad, gestión visual y automatización.
+    const data = await response.json();
 
-Funciones clave:
-• Dashboard principal
-• Gestión de proyectos
-• Tareas reales
-• Analytics visuales
-• Creator Studio
-• Exportar/importar datos
-• Firebase Cloud Sync`;
+    aiResult.innerHTML = `
+      <div class="ai-card">
+        <h3>🚀 Resultado IA</h3>
+        <div class="ai-text">${data.text || "No pude generar respuesta."}</div>
+      </div>
+    `;
+  }catch(error){
+    aiResult.innerHTML = `
+      <div class="ai-card">
+        <h3>⚠️ Error</h3>
+        <div class="ai-text">Error conectando IA.</div>
+      </div>
+    `;
   }
-
-  if(type === "roadmap"){
-    result = `🚀 Roadmap generado:
-
-Fase 1: Definir objetivo del producto
-Fase 2: Crear landing page
-Fase 3: Construir dashboard
-Fase 4: Agregar tareas reales
-Fase 5: Guardar en Firestore
-Fase 6: Mejorar UI/UX
-Fase 7: Publicar en GitHub Pages
-Fase 8: Presentarlo en LinkedIn`;
-  }
-
-  if(type === "tasks"){
-    result = `✅ Tareas sugeridas:
-
-1. Crear estructura del proyecto
-2. Diseñar interfaz principal
-3. Crear tareas reales
-4. Agregar progreso por proyecto
-5. Guardar datos en Firestore
-6. Mejorar responsive
-7. Publicar online`;
-  }
-
-  if(type === "linkedin"){
-    result = `🚀 Estoy desarrollando ${prompt}
-
-Una plataforma web moderna para organizar proyectos, tareas, contenido y productividad.
-
-Este proyecto combina JavaScript, diseño UI/UX, Firebase Auth, Firestore y una experiencia visual tipo SaaS.
-
-#JavaScript #Firebase #Frontend #WebDevelopment #Developer`;
-  }
-
-  typeWriter(resultBox, result);
-};
-
-function typeWriter(element, text){
-  element.innerText = "";
-
-  let i = 0;
-
-  const interval = setInterval(() => {
-    element.innerText += text.charAt(i);
-    i++;
-
-    if(i >= text.length){
-      clearInterval(interval);
-    }
-  }, 12);
 }
+
+window.generateAIResponse = generateAIResponse;
 
 /* BACKUP */
 
-window.exportBackup = function(){
+function exportBackup(){
   const backup = {
+    user: currentUser ? currentUser.email : "",
     projects,
-    contents,
-    user: currentUser ? currentUser.email : ""
+    contents
   };
 
   const data = JSON.stringify(backup, null, 2);
@@ -528,7 +540,9 @@ window.exportBackup = function(){
   URL.revokeObjectURL(url);
 
   toast("Backup exportado 📦");
-};
+}
+
+window.exportBackup = exportBackup;
 
 document.addEventListener("change", function(e){
   if(e.target.id !== "importFile") return;
@@ -546,7 +560,6 @@ document.addEventListener("change", function(e){
       contents = data.contents || [];
 
       await saveCloudData();
-
       renderAll();
 
       toast("Backup importado correctamente 🚀");
@@ -560,17 +573,16 @@ document.addEventListener("change", function(e){
 
 /* DEMO */
 
-window.loadDemoData = async function(){
+async function loadDemoData(){
   projects = [
     {
       id: Date.now() + 1,
       name: "Nexora OS Lite",
       status: "Publicado",
       tasks: [
-        { id: 1, text: "Crear dashboard", done: true },
-        { id: 2, text: "Agregar Firebase Auth", done: true },
-        { id: 3, text: "Conectar Firestore", done: true },
-        { id: 4, text: "Publicar en GitHub Pages", done: true }
+        { id: 1, text: "Firebase Auth", done: true },
+        { id: 2, text: "Firestore Cloud", done: true },
+        { id: 3, text: "Gemini AI", done: true }
       ]
     },
     {
@@ -578,64 +590,23 @@ window.loadDemoData = async function(){
       name: "Creator Studio",
       status: "En desarrollo",
       tasks: [
-        { id: 5, text: "Diseñar calendario", done: true },
-        { id: 6, text: "Generar ideas de contenido", done: false }
-      ]
-    },
-    {
-      id: Date.now() + 3,
-      name: "Portfolio Futurista",
-      status: "Idea",
-      tasks: [
-        { id: 7, text: "Crear landing", done: false },
-        { id: 8, text: "Agregar animaciones", done: false }
+        { id: 4, text: "Diseñar cards", done: true },
+        { id: 5, text: "Agregar calendario", done: false }
       ]
     }
   ];
 
   contents = [
-    { id: Date.now() + 4, title: "Post lanzamiento Nexora", status: "Idea" },
-    { id: Date.now() + 5, title: "Video mostrando dashboard", status: "En producción" }
+    { id: Date.now() + 3, title: "Post lanzamiento Nexora", status: "Idea" }
   ];
 
   await saveCloudData();
-
   renderAll();
 
   toast("Demo cargada 🚀");
-};
-
-/* TOAST */
-
-function toast(message){
-  const toastBox = document.getElementById("toastBox");
-  if(!toastBox){
-    console.log(message);
-    return;
-  }
-
-  const div = document.createElement("div");
-  div.className = "toast";
-  div.innerText = message;
-
-  toastBox.appendChild(div);
-
-  setTimeout(() => {
-    div.remove();
-  }, 3000);
 }
 
-/* LOADER */
-
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    const loader = document.getElementById("loader");
-    if(loader){
-      loader.classList.add("hidden");
-      loader.style.display = "none";
-    }
-  }, 1200);
-});
+window.loadDemoData = loadDemoData;
 
 /* RENDER */
 
@@ -647,4 +618,10 @@ function renderAll(){
 
 /* START */
 
-setupLoginUI();
+document.addEventListener("DOMContentLoaded", () => {
+  const generateBtn = $("generateIdea");
+
+  if(generateBtn){
+    generateBtn.addEventListener("click", generateAIResponse);
+  }
+});
