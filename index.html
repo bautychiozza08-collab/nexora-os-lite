@@ -1,294 +1,438 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <title>Nexora OS Lite</title>
 
-  <link rel="stylesheet" href="style.css">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family:'Inter',sans-serif;
+      min-height:100vh;
+      overflow-x:hidden;
+      color:white;
+
+      background:
+      radial-gradient(circle at top right,#1f7a1f 0%,transparent 25%),
+      radial-gradient(circle at bottom left,#0f172a 0%,transparent 35%),
+      #020617;
+    }
+
+    .landing{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:80px 40px;
+      position:relative;
+    }
+
+    .landing::before{
+      content:"";
+      position:absolute;
+      width:700px;
+      height:700px;
+      background:#63ff2f;
+      filter:blur(180px);
+      opacity:.08;
+      top:-200px;
+      right:-200px;
+      z-index:0;
+    }
+
+    .hero{
+      width:100%;
+      max-width:1250px;
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:70px;
+      align-items:center;
+      position:relative;
+      z-index:2;
+    }
+
+    .hero-left{
+
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 22px;
+      border-radius:999px;
+      background:rgba(99,255,47,.08);
+      border:1px solid rgba(99,255,47,.2);
+      color:#63ff2f;
+      font-weight:700;
+      margin-bottom:30px;
+      box-shadow:0 0 25px rgba(99,255,47,.08);
+    }
+
+    .hero-left h1{
+      font-size:86px;
+      line-height:.95;
+      font-weight:900;
+      margin-bottom:28px;
+      letter-spacing:-3px;
+    }
+
+    .hero-left h1 span{
+      color:#63ff2f;
+      text-shadow:
+      0 0 25px rgba(99,255,47,.6),
+      0 0 50px rgba(99,255,47,.25);
+    }
+
+    .hero-left p{
+      font-size:22px;
+      line-height:1.7;
+      color:#94a3b8;
+      max-width:700px;
+      margin-bottom:42px;
+    }
+
+    .buttons{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .primary-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px 42px;
+      border-radius:24px;
+
+      background:
+      linear-gradient(135deg,#63ff2f,#2cff88);
+
+      color:#020617;
+      text-decoration:none;
+      font-size:19px;
+      font-weight:900;
+      letter-spacing:.4px;
+
+      box-shadow:
+      0 0 30px rgba(99,255,47,.35),
+      0 20px 60px rgba(99,255,47,.18);
+
+      transition:.3s;
+    }
+
+    .primary-btn:hover{
+      transform:translateY(-7px) scale(1.04);
+
+      box-shadow:
+      0 0 45px rgba(99,255,47,.5),
+      0 25px 70px rgba(99,255,47,.25);
+    }
+
+    .secondary-btn{
+      padding:20px 34px;
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.08);
+      background:#0b1325;
+      color:white;
+      text-decoration:none;
+      font-weight:700;
+      transition:.25s;
+    }
+
+    .secondary-btn:hover{
+      transform:translateY(-5px);
+      border-color:#63ff2f;
+    }
+
+    .quote{
+      margin-top:34px;
+      font-size:20px;
+      color:#63ff2f;
+      font-weight:700;
+      opacity:.92;
+      text-shadow:0 0 18px rgba(99,255,47,.35);
+    }
+
+    .hero-right{
+      position:relative;
+    }
+
+    .dashboard-preview{
+      background:
+      linear-gradient(
+      180deg,
+      rgba(8,18,38,.95),
+      rgba(3,7,18,.98)
+      );
+
+      border:1px solid rgba(99,255,47,.12);
+
+      border-radius:34px;
+
+      padding:30px;
+
+      box-shadow:
+      0 0 60px rgba(99,255,47,.08),
+      0 40px 120px rgba(0,0,0,.45);
+
+      backdrop-filter:blur(20px);
+    }
+
+    .preview-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
+    }
+
+    .preview-logo{
+      font-size:28px;
+      font-weight:900;
+    }
+
+    .preview-logo span{
+      color:#63ff2f;
+    }
+
+    .preview-status{
+      color:#63ff2f;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .preview-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:18px;
+      margin-bottom:20px;
+    }
+
+    .preview-card{
+      background:#0b1325;
+      border:1px solid rgba(255,255,255,.04);
+      border-radius:22px;
+      padding:22px;
+      transition:.25s;
+    }
+
+    .preview-card:hover{
+      transform:translateY(-5px);
+      border-color:rgba(99,255,47,.22);
+    }
+
+    .preview-card h3{
+      margin-bottom:12px;
+      font-size:18px;
+    }
+
+    .preview-card p{
+      color:#94a3b8;
+      line-height:1.6;
+      font-size:15px;
+    }
+
+    .bottom-preview{
+      margin-top:22px;
+      background:#081226;
+      border-radius:22px;
+      padding:22px;
+      border:1px solid rgba(99,255,47,.08);
+    }
+
+    .bottom-preview h4{
+      margin-bottom:12px;
+      color:#63ff2f;
+    }
+
+    .bottom-preview p{
+      color:#94a3b8;
+      line-height:1.6;
+    }
+
+    .footer{
+      position:absolute;
+      bottom:20px;
+      left:50%;
+      transform:translateX(-50%);
+      color:#64748b;
+      font-size:14px;
+    }
+
+    @media(max-width:1050px){
+
+      .hero{
+        grid-template-columns:1fr;
+      }
+
+      .hero-left h1{
+        font-size:62px;
+      }
+
+    }
+
+    @media(max-width:700px){
+
+      .landing{
+        padding:50px 24px;
+      }
+
+      .hero-left h1{
+        font-size:48px;
+        letter-spacing:-2px;
+      }
+
+      .hero-left p{
+        font-size:18px;
+      }
+
+      .preview-grid{
+        grid-template-columns:1fr;
+      }
+
+      .buttons{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+    }
+
+  </style>
 </head>
 
-<body class="landing-body">
+<body>
 
-  <div class="landing-bg"></div>
+<section class="landing">
 
-  <header class="landing-nav">
-    <a href="index.html" class="landing-logo">
-      NEXORA<span>OS</span>
-    </a>
+  <div class="hero">
 
-    <nav>
-      <a href="#features">Features</a>
-      <a href="#ai">IA</a>
-      <a href="#product">Producto</a>
-      <a href="app.html" class="nav-cta">Abrir app</a>
-    </nav>
-  </header>
+    <!-- LEFT -->
+    <div class="hero-left">
 
-  <main>
-
-    <section class="landing-hero">
-
-      <div class="hero-copy">
-
-        <span class="landing-badge">
-          AI WORKSPACE · FIREBASE · SAAS
-        </span>
-
-        <h1 class="hero-title">
-          El workspace futurista para
-          <span>developers & creators.</span>
-        </h1>
-
-        <p>
-          Organizá proyectos, tareas, ideas y contenido desde una plataforma visual
-          con login real, analytics, IA y experiencia tipo SaaS.
-        </p>
-
-        <div class="landing-actions">
-          <a href="app.html" class="primary-btn">
-            Entrar a Nexora
-          </a>
-
-          <a
-            href="https://github.com/bautychiozza08-collab/nexora-os-lite"
-            target="_blank"
-            class="secondary-btn"
-          >
-            Ver GitHub
-          </a>
-        </div>
-
-        <div class="landing-stats">
-          <div>
-            <strong>Firebase</strong>
-            <span>Auth real</span>
-          </div>
-
-          <div>
-            <strong>Firestore</strong>
-            <span>Cloud DB</span>
-          </div>
-
-          <div>
-            <strong>AI</strong>
-            <span>Assistant</span>
-          </div>
-        </div>
-
+      <div class="badge">
+        ⚡ NEXORA OS LITE
       </div>
 
-      <div class="hero-mockup">
-
-        <div class="mock-window">
-
-          <div class="mock-top">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
-          <div class="mock-content">
-
-            <div class="mock-sidebar">
-              <b>NEXORA</b>
-
-              <p>🏠 Dashboard</p>
-              <p>🚀 Proyectos</p>
-              <p>🎬 Creator</p>
-            </div>
-
-            <div class="mock-main">
-
-              <div class="mock-card big">
-                <small>NEXORA OS LITE</small>
-
-                <h3>
-                  Hola, Developer 👋
-                </h3>
-
-                <p>
-                  Listo para construir tu próximo proyecto.
-                </p>
-              </div>
-
-              <div class="mock-grid">
-
-                <div>
-                  <span>🚀</span>
-                  <b>12</b>
-                  <small>Proyectos</small>
-                </div>
-
-                <div>
-                  <span>✅</span>
-                  <b>36</b>
-                  <small>Tareas</small>
-                </div>
-
-                <div>
-                  <span>🔥</span>
-                  <b>84%</b>
-                  <small>Productividad</small>
-                </div>
-
-              </div>
-
-              <div class="mock-ai">
-                🤖 Generando roadmap inteligente...
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <section id="features" class="landing-features">
-
-      <div class="landing-card">
-        <h3>🚀 Proyectos</h3>
-
-        <p>
-          Creá proyectos, agregá tareas, medí progreso y organizá estados.
-        </p>
-      </div>
-
-      <div class="landing-card">
-        <h3>🎬 Creator Studio</h3>
-
-        <p>
-          Guardá ideas de contenido y prepará publicaciones para redes.
-        </p>
-      </div>
-
-      <div class="landing-card">
-        <h3>📊 Analytics</h3>
-
-        <p>
-          Visualizá productividad, tareas y avance desde un dashboard moderno.
-        </p>
-      </div>
-
-    </section>
-
-    <section id="ai" class="landing-section split">
-
-      <div>
-        <span class="landing-badge">
-          POWERED BY AI
-        </span>
-
-        <h2>
-          Tu asistente para construir más rápido.
-        </h2>
-
-        <p>
-          Nexora AI ayuda a generar ideas, roadmaps, tareas y publicaciones para LinkedIn.
-          Ideal para transformar una idea en producto real.
-        </p>
-      </div>
-
-      <div class="ai-terminal">
-        <pre>prompt: "Crear app para estudiantes"
-
-Nexora AI:
-✓ Idea SaaS generada
-✓ Roadmap creado
-✓ Tareas sugeridas
-✓ Post LinkedIn listo</pre>
-      </div>
-
-    </section>
-
-    <section id="product" class="landing-section center">
-
-      <span class="landing-badge">
-        PRODUCT READY
-      </span>
-
-      <h2>
-        De proyecto a producto.
-      </h2>
+      <h1>
+        El workspace <br>
+        del <span>futuro.</span>
+      </h1>
 
       <p>
-        Nexora OS Lite combina JavaScript, Firebase Auth, Firestore,
-        diseño UI/UX, productividad y una experiencia moderna lista para portfolio.
+        IA, productividad y creación de contenido
+        en una sola plataforma.
+        Diseñado para developers, creators y startups modernas.
       </p>
 
-    </section>
+      <div class="buttons">
 
-    <section class="pricing">
+        <a href="app.html" class="primary-btn">
+          🚀 Launch Workspace
+        </a>
 
-      <div class="price-card">
-        <h3>Lite</h3>
+        <a href="https://github.com/bautychiozza08-collab/nexora-os-lite"
+           class="secondary-btn"
+           target="_blank">
+          🌐 GitHub
+        </a>
 
-        <p>
-          Para organizar proyectos personales.
-        </p>
-
-        <strong>$0</strong>
-
-        <span>
-          Dashboard + tareas + backup
-        </span>
       </div>
 
-      <div class="price-card featured">
-        <h3>Creator</h3>
-
-        <p>
-          Para developers y creadores.
-        </p>
-
-        <strong>PRO</strong>
-
-        <span>
-          IA + Creator Studio + Analytics
-        </span>
+      <div class="quote">
+        “Construyendo proyectos hoy,
+        para el futuro mañana.”
       </div>
 
-      <div class="price-card">
-        <h3>Cloud</h3>
+    </div>
 
-        <p>
-          Para usuarios reales.
-        </p>
+    <!-- RIGHT -->
+    <div class="hero-right">
 
-        <strong>Firebase</strong>
+      <div class="dashboard-preview">
 
-        <span>
-          Auth + Firestore + Multiusuario
-        </span>
+        <div class="preview-top">
+
+          <div class="preview-logo">
+            NEXORA <span>OS</span>
+          </div>
+
+          <div class="preview-status">
+            ● AI ONLINE
+          </div>
+
+        </div>
+
+        <div class="preview-grid">
+
+          <div class="preview-card">
+            <h3>🤖 AI Assistant</h3>
+            <p>
+              Generación inteligente de ideas,
+              roadmap, branding y contenido.
+            </p>
+          </div>
+
+          <div class="preview-card">
+            <h3>🎬 Creator Studio</h3>
+            <p>
+              Posts de LinkedIn, Shorts Ideas
+              y branding automático.
+            </p>
+          </div>
+
+          <div class="preview-card">
+            <h3>🚀 Projects</h3>
+            <p>
+              Organización moderna de tareas,
+              proyectos y productividad.
+            </p>
+          </div>
+
+          <div class="preview-card">
+            <h3>☁️ Cloud Ready</h3>
+            <p>
+              Preparado para escalar como
+              SaaS real y plataforma online.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="bottom-preview">
+
+          <h4>⚡ Gemini AI + Vercel Integration</h4>
+
+          <p>
+            Nexora OS Lite utiliza IA real para generar contenido,
+            ideas de negocio y branding automáticamente
+            desde una experiencia visual futurista.
+          </p>
+
+        </div>
+
       </div>
 
-    </section>
+    </div>
 
-    <section class="landing-cta">
+  </div>
 
-      <h2>
-        Construí tu workspace futurista.
-      </h2>
+  <div class="footer">
+    Built by Bautista Chiozza
+  </div>
 
-      <p>
-        Entrá, probalo y convertí tus ideas en proyectos reales.
-      </p>
-
-      <a href="app.html">
-        Abrir Nexora OS Lite
-      </a>
-
-    </section>
-
-  </main>
+</section>
 
 </body>
 </html>
