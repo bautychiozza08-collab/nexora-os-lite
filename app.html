@@ -16,10 +16,8 @@
 
 <div id="toastBox" class="toast-box"></div>
 
-<!-- LOGIN -->
 <section id="loginScreen" class="login-screen">
   <div class="login-card">
-
     <h1>NEXORA<span> OS</span></h1>
 
     <p>Iniciá sesión o registrate para guardar tu workspace.</p>
@@ -28,60 +26,46 @@
     <input type="password" id="password" placeholder="Contraseña">
 
     <div class="login-actions">
-  <button id="loginBtn" class="login-btn">
-    Entrar
-  </button>
-
-  <button id="registerBtn" class="login-btn secondary">
-    Crear cuenta
-  </button>
-</div>
-
+      <button id="loginBtn" class="login-btn">Entrar</button>
+      <button id="registerBtn" class="login-btn secondary">Crear cuenta</button>
+    </div>
   </div>
 </section>
 
-<!-- APP -->
 <section id="appScreen" class="hidden">
 
   <div class="app-layout">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
-
       <div class="logo">
         NEXORA <span>OS</span>
       </div>
 
       <div class="sidebar-buttons">
+        <button class="nav-btn active" data-section="dashboard">
+          🏠 Dashboard
+        </button>
 
-        <button class="nav-btn active" onclick="showSection('dashboard')">
-  🏠 Dashboard
-</button>
+        <button class="nav-btn" data-section="projects">
+          🚀 Proyectos
+        </button>
 
-<button class="nav-btn" onclick="showSection('projects')">
-  🚀 Proyectos
-</button>
+        <button class="nav-btn" data-section="creator">
+          🎬 Creator Studio
+        </button>
 
-<button class="nav-btn" onclick="showSection('creator')">
-  🎬 Creator Studio
-</button>
+        <button class="nav-btn" data-action="export">
+          📤 Exportar
+        </button>
 
-<button class="nav-btn" onclick="exportBackup()">
-  📤 Exportar
-</button>
-
-<button class="nav-btn" onclick="logoutLocal()">
-  👤 Cambiar usuario
-</button>
-
+        <button class="nav-btn" data-action="logout">
+          👤 Cambiar usuario
+        </button>
       </div>
-
     </aside>
 
-    <!-- CONTENT -->
     <main class="main-content">
 
-      <!-- DASHBOARD -->
       <section id="dashboardSection" class="page-section">
 
         <div class="hero-card">
@@ -97,9 +81,7 @@
           </p>
         </div>
 
-        <!-- STATS -->
         <div class="stats-grid">
-
           <div class="stat-card">
             <small>Proyectos activos</small>
             <h3>🚀 Proyectos</h3>
@@ -109,26 +91,23 @@
           <div class="stat-card">
             <small>Tareas totales</small>
             <h3>📝 Tareas</h3>
-            <div class="stat-number">0</div>
+            <div class="stat-number" id="tasksCount">0</div>
           </div>
 
           <div class="stat-card">
             <small>Avance general</small>
             <h3>🔥 Productividad</h3>
-            <div class="stat-number">0%</div>
+            <div class="stat-number" id="productivityCount">0%</div>
           </div>
 
           <div class="stat-card">
             <small>Creator Studio</small>
             <h3>🎬 Contenido</h3>
-            <div class="stat-number">0</div>
+            <div class="stat-number" id="creatorCount">3</div>
           </div>
-
         </div>
 
-        <!-- IA -->
         <div class="ai-section">
-
           <h2>🤖 Nexora AI Assistant</h2>
 
           <textarea
@@ -137,16 +116,14 @@
           ></textarea>
 
           <button id="generateIdea" class="ai-btn">
-      ✨  Generar idea
+            ✨ Generar idea
           </button>
 
           <div id="aiResult"></div>
-
         </div>
 
       </section>
 
-      <!-- PROYECTOS -->
       <section id="projectsSection" class="page-section hidden">
 
         <div class="section-title">
@@ -154,43 +131,47 @@
         </div>
 
         <div class="project-box">
-
           <input
             type="text"
             id="projectInput"
             placeholder="Nombre del proyecto..."
           >
 
-          <button onclick="addProject()">
+          <button id="createProjectBtn" class="ai-btn">
             Crear proyecto
           </button>
-
         </div>
 
         <div id="projectsList" class="projects-grid"></div>
 
       </section>
 
-      <!-- CREATOR -->
       <section id="creatorSection" class="page-section hidden">
 
         <div class="section-title">
           🎬 Creator Studio
         </div>
 
+        <div class="creator-prompt-box">
+          <input
+            id="creatorPrompt"
+            placeholder="Ej: app para veterinarias, portfolio IA, sistema para cooperativa..."
+          >
+        </div>
+
         <div class="creator-grid">
 
-          <div class="creator-card">
+          <div class="creator-card" data-creator="linkedin">
             <h3>📸 Post LinkedIn</h3>
             <p>Generá contenido profesional automáticamente.</p>
           </div>
 
-          <div class="creator-card">
+          <div class="creator-card" data-creator="shorts">
             <h3>🎥 Shorts Ideas</h3>
             <p>Ideas virales para TikTok, Reels y YouTube Shorts.</p>
           </div>
 
-          <div class="creator-card">
+          <div class="creator-card" data-creator="branding">
             <h3>🧠 Branding</h3>
             <p>Nombres, slogans y conceptos visuales para startups.</p>
           </div>
@@ -205,7 +186,7 @@
 
 </section>
 
-<script type="module" src="app.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>

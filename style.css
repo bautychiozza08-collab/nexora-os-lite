@@ -2847,3 +2847,13 @@ textarea{
   border-color:#63ff2f;
   color:#63ff2f;
 }
+.creator-card{
+  cursor:pointer;
+  transition:.25s;
+}
+
+.creator-card:hover{
+  transform:translateY(-6px);
+  border-color:#63ff2f;
+  box-shadow:0 20px 50px rgba(99,255,47,.12);
+}
