@@ -625,3 +625,30 @@ document.addEventListener("DOMContentLoaded", () => {
     generateBtn.addEventListener("click", generateAIResponse);
   }
 });
+window.showSection = function(section){
+  const dashboard = document.getElementById("dashboardSection");
+  const projects = document.getElementById("projectsSection");
+  const creator = document.getElementById("creatorSection");
+
+  if(dashboard) dashboard.classList.add("hidden");
+  if(projects) projects.classList.add("hidden");
+  if(creator) creator.classList.add("hidden");
+
+  if(section === "dashboard" && dashboard){
+    dashboard.classList.remove("hidden");
+  }
+
+  if(section === "projects" && projects){
+    projects.classList.remove("hidden");
+  }
+
+  if(section === "creator" && creator){
+    creator.classList.remove("hidden");
+  }
+
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  event.target.classList.add("active");
+};
